@@ -14,7 +14,181 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attempts: {
+        Row: {
+          answers: Json
+          auto_submitted: boolean
+          enrolled_manually: boolean
+          expires_at: string | null
+          id: string
+          quiz_id: string
+          score: number | null
+          started_at: string | null
+          status: string
+          student_id: string
+          submitted_at: string | null
+        }
+        Insert: {
+          answers?: Json
+          auto_submitted?: boolean
+          enrolled_manually?: boolean
+          expires_at?: string | null
+          id?: string
+          quiz_id: string
+          score?: number | null
+          started_at?: string | null
+          status?: string
+          student_id: string
+          submitted_at?: string | null
+        }
+        Update: {
+          answers?: Json
+          auto_submitted?: boolean
+          enrolled_manually?: boolean
+          expires_at?: string | null
+          id?: string
+          quiz_id?: string
+          score?: number | null
+          started_at?: string | null
+          status?: string
+          student_id?: string
+          submitted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attempts_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attempts_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          branch: Database["public"]["Enums"]["branch_type"]
+          created_at: string
+          id: string
+          name: string
+          photo_path: string | null
+          roll_no: string
+        }
+        Insert: {
+          branch: Database["public"]["Enums"]["branch_type"]
+          created_at?: string
+          id: string
+          name: string
+          photo_path?: string | null
+          roll_no: string
+        }
+        Update: {
+          branch?: Database["public"]["Enums"]["branch_type"]
+          created_at?: string
+          id?: string
+          name?: string
+          photo_path?: string | null
+          roll_no?: string
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          correct_index: number
+          id: string
+          options: Json
+          position: number
+          prompt: string
+          quiz_id: string
+        }
+        Insert: {
+          correct_index: number
+          id?: string
+          options: Json
+          position: number
+          prompt: string
+          quiz_id: string
+        }
+        Update: {
+          correct_index?: number
+          id?: string
+          options?: Json
+          position?: number
+          prompt?: string
+          quiz_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_pins: {
+        Row: {
+          pin: string
+          quiz_id: string
+        }
+        Insert: {
+          pin: string
+          quiz_id: string
+        }
+        Update: {
+          pin?: string
+          quiz_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_pins_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: true
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quizzes: {
+        Row: {
+          created_at: string
+          duration_minutes: number
+          ends_at: string
+          id: string
+          is_published: boolean
+          starts_at: string
+          target_branch: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes: number
+          ends_at: string
+          id?: string
+          is_published?: boolean
+          starts_at: string
+          target_branch?: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number
+          ends_at?: string
+          id?: string
+          is_published?: boolean
+          starts_at?: string
+          target_branch?: string
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +197,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      branch_type: "CSE-A" | "CSE-B" | "AI-DS" | "CSE(AI)" | "ECE"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +324,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      branch_type: ["CSE-A", "CSE-B", "AI-DS", "CSE(AI)", "ECE"],
+    },
   },
 } as const

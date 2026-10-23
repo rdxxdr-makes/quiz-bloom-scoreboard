@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792773309172,
+      "tag": "0000_harsh_quiz_portal_schema",
+      "breakpoints": true
+    }
+  ]
 }
