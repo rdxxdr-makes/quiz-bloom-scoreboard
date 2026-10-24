@@ -320,3 +320,18 @@ export const submitAttempt = createServerFn({ method: "POST" })
     if (error) return { ok: false as const, error: "Could not submit. Please try again." };
     return { ok: true as const, score, total: list.length, alreadySubmitted: false };
   });
+
+/** Dashboard list: this student's attempts with quiz titles. */
+export const getMyAttempts = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase } = context;
+    const { data, error } = await supabase
+      .from("attempts")
+      .select(
+        "id, quiz_id, status, score, expires_at, started_at, enrolled_manually, auto_submitted, quiz:quizzes(title)",
+      )
+      .order("started_at", { ascending: false, nullsFirst: false });
+    if (error) return { ok: false as const, error: "Could not load your attempts." };
+    return { ok: true as const, attempts: data ?? [] };
+  });
