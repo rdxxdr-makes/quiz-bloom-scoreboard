@@ -16,7 +16,7 @@ const studentOnboardSchema = z.object({
 export const onboardStudent = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => studentOnboardSchema.parse(input))
   .handler(async ({ data }) => {
-    if (!safeEqualSecret(data.pin, process.env.STUDENT_PIN)) {
+    if (!safeEqualSecret(data.pin, process.env["STUDENT_PIN"])) {
       return { ok: false as const, error: "Incorrect student PIN." };
     }
     const rollNo = normalizeRollNo(data.rollNo);
@@ -65,7 +65,7 @@ const studentLoginSchema = z.object({
 export const loginStudent = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => studentLoginSchema.parse(input))
   .handler(async ({ data }) => {
-    if (!safeEqualSecret(data.pin, process.env.STUDENT_PIN)) {
+    if (!safeEqualSecret(data.pin, process.env["STUDENT_PIN"])) {
       return { ok: false as const, error: "Incorrect student PIN." };
     }
     const rollNo = normalizeRollNo(data.rollNo);

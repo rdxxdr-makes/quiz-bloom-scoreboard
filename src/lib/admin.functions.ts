@@ -12,14 +12,14 @@ export const adminLogin = createServerFn({ method: "POST" })
     z.object({ pin: z.string().min(1).max(64) }).parse(input),
   )
   .handler(async ({ data }) => {
-    if (!safeEqualSecret(data.pin, process.env.ADMIN_PIN)) {
+    if (!safeEqualSecret(data.pin, process.env["ADMIN_PIN"])) {
       return { ok: false as const, error: "Incorrect admin PIN." };
     }
-    return { ok: true as const, token: signAdminToken(process.env.ADMIN_PIN) };
+    return { ok: true as const, token: signAdminToken(process.env["ADMIN_PIN"]) };
   });
 
 function checkToken(token: string): { ok: false; error: string } | null {
-  if (!verifyAdminToken(token, process.env.ADMIN_PIN)) {
+  if (!verifyAdminToken(token, process.env["ADMIN_PIN"])) {
     return { ok: false, error: "Admin session expired. Please sign in again." };
   }
   return null;
@@ -87,7 +87,15 @@ export const adminDashboard = createServerFn({ method: "POST" })
       supabaseAdmin.from("questions").select("id, quiz_id"),
     ]);
 
-    const quizzes = (quizRes.data ?? []) as Array<Record<string, unknown>>;
+    const quizzes = (quizRes.data ?? []) as Array<{
+      id: string;
+      title: string;
+      target_branch: string;
+      duration_minutes: number;
+      starts_at: string;
+      ends_at: string;
+      is_published: boolean;
+    }>;
     const pins = (pinRes.data ?? []) as Array<{ pin: string; quiz_id: string }>;
     const profiles = (profileRes.data ?? []) as AdminProfileRow[];
     const attempts = (attemptRes.data ?? []) as Array<{
@@ -105,7 +113,7 @@ export const adminDashboard = createServerFn({ method: "POST" })
     const questions = (questionRes.data ?? []) as Array<{ id: string; quiz_id: string }>;
 
     const rows: AdminQuizRow[] = quizzes.map((q) => {
-      const quizId = String(q.id);
+      const quizId = q.id;
       const quizAttempts = attempts
         .filter((a) => a.quiz_id === quizId)
         .map((a) => ({

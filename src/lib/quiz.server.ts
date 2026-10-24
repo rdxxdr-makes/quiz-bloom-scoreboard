@@ -25,6 +25,7 @@ export function signAdminToken(secret: string | undefined, now: number = Date.no
 export function verifyAdminToken(token: string | undefined, secret: string | undefined): boolean {
   if (!token || !secret || !token.includes(".")) return false;
   const [payload, sig] = token.split(".");
+  if (!payload || !sig) return false;
   const expected = createHmac("sha256", secret).update(payload).digest("base64url");
   const a = Buffer.from(sig);
   const b = Buffer.from(expected);
