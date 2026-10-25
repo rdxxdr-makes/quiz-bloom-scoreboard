@@ -27,6 +27,7 @@ function checkToken(token: string): { ok: false; error: string } | null {
 
 export type AdminAttemptRow = {
   id: string;
+  student_id: string;
   name: string;
   roll_no: string;
   branch: string;
