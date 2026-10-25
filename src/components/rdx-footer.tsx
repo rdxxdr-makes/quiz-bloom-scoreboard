@@ -1,6 +1,8 @@
 /**
- * Animated footer: an illustrated RDX car that drives across the road in a
- * continuous loop. Pure CSS/SVG animation — no animation library.
+ * Animated footer: a clearly visible RED illustrated RDX car that drives
+ * across the road from left to right in a continuous loop. Pure CSS/SVG
+ * animation — no animation library. Wheels rotate, the body bobs, road
+ * dashes stream by and clouds drift in the background.
  */
 export function RdxFooter() {
   return (
@@ -13,7 +15,7 @@ export function RdxFooter() {
           viewBox="0 0 1100 40"
           aria-hidden="true"
         >
-          <g fill="var(--muted)" opacity="0.5">
+          <g fill="var(--rdx-glass)" opacity="0.55">
             <ellipse cx="80" cy="26" rx="34" ry="11" />
             <ellipse cx="102" cy="21" rx="24" ry="10" />
             <ellipse cx="58" cy="22" rx="20" ry="9" />
@@ -29,7 +31,7 @@ export function RdxFooter() {
           viewBox="0 0 1100 40"
           aria-hidden="true"
         >
-          <g fill="var(--muted)" opacity="0.3">
+          <g fill="var(--rdx-glass)" opacity="0.35">
             <ellipse cx="240" cy="20" rx="36" ry="10" />
             <ellipse cx="268" cy="16" rx="24" ry="9" />
             <ellipse cx="660" cy="24" rx="44" ry="12" />
@@ -44,15 +46,15 @@ export function RdxFooter() {
           viewBox="0 0 1200 40"
           aria-hidden="true"
         >
-          <rect width="1200" height="40" fill="var(--card)" />
-          <rect y="0" width="1200" height="3" fill="var(--border)" />
+          <rect width="1200" height="40" fill="var(--rdx-ink)" opacity="0.9" />
+          <rect y="0" width="1200" height="3" fill="var(--brand-yellow)" opacity="0.85" />
           <line
             className="rdx-road"
             x1="0"
             y1="21"
             x2="1200"
             y2="21"
-            stroke="var(--primary)"
+            stroke="var(--brand-yellow)"
             strokeWidth="4"
             strokeDasharray="38 26"
             strokeLinecap="round"
@@ -64,7 +66,7 @@ export function RdxFooter() {
           <CarSvg />
         </div>
       </div>
-      <p className="pb-3 text-center text-xs text-muted-foreground">
+      <p className="pb-3 text-center text-xs font-semibold text-muted-foreground">
         Harsh Quiz Portal — RDX Quiz Series
       </p>
     </footer>
@@ -75,56 +77,63 @@ function CarSvg() {
   return (
     <svg
       className="rdx-bob"
-      width="220"
-      height="72"
-      viewBox="0 0 220 72"
-      aria-label="RDX car"
+      width="240"
+      height="80"
+      viewBox="0 0 240 80"
+      aria-label="Red RDX car driving across the road"
     >
       {/* ground shadow */}
-      <ellipse cx="108" cy="62" rx="98" ry="5" fill="var(--background)" opacity="0.55" />
+      <ellipse cx="118" cy="68" rx="104" ry="5" fill="var(--background)" opacity="0.5" />
       {/* cabin */}
       <path
-        d="M52 34 Q60 14 88 12 L128 12 Q148 14 158 34 Z"
-        fill="var(--accent)"
+        d="M58 38 Q66 16 96 14 L138 14 Q160 16 170 38 Z"
+        fill="var(--rdx-red)"
       />
       {/* windows */}
-      <path d="M64 32 Q70 18 90 17 L104 17 L104 32 Z" fill="var(--background)" />
-      <path d="M110 17 L124 17 Q140 19 148 32 L110 32 Z" fill="var(--background)" />
+      <path d="M70 36 Q76 20 98 19 L112 19 L112 36 Z" fill="var(--rdx-glass)" />
+      <path d="M118 19 L134 19 Q152 21 160 36 L118 36 Z" fill="var(--rdx-glass)" />
+      {/* roof highlight */}
+      <path d="M66 22 Q80 15 100 14 L100 18 Q84 19 72 25 Z" fill="var(--rdx-red-dark)" />
       {/* body */}
       <path
-        d="M18 34 L206 34 Q212 34 212 42 L210 50 Q210 54 204 54 L24 54 Q16 54 16 48 L16 40 Q16 34 18 34 Z"
-        fill="var(--accent)"
+        d="M18 38 L208 38 Q216 38 216 46 L214 56 Q214 60 208 60 L26 60 Q18 60 18 54 L18 44 Q18 38 18 38 Z"
+        fill="var(--rdx-red)"
       />
-      {/* body stripe */}
-      <rect x="20" y="44" width="188" height="4" rx="2" fill="var(--background)" opacity="0.35" />
-      {/* RDX lettering */}
+      {/* body shading */}
+      <rect x="20" y="54" width="192" height="5" rx="2.5" fill="var(--rdx-red-dark)" opacity="0.85" />
+      {/* bumper + chrome trim */}
+      <rect x="20" y="48" width="196" height="3" rx="1.5" fill="var(--rdx-chrome)" opacity="0.9" />
+      {/* RDX lettering — black, bold */}
       <text
-        x="108"
-        y="42"
+        x="116"
+        y="46"
         textAnchor="middle"
-        fontSize="11"
+        fontSize="15"
         fontWeight="900"
-        letterSpacing="3"
-        fill="var(--primary-foreground)"
+        letterSpacing="4"
+        fill="var(--rdx-ink)"
         fontFamily="ui-sans-serif, system-ui, sans-serif"
       >
         RDX
       </text>
-      {/* headlight + taillight */}
-      <circle cx="206" cy="38" r="3" fill="var(--primary)" />
-      <rect x="14" y="37" width="5" height="5" rx="1.5" fill="var(--destructive)" />
+      {/* headlight (yellow) + taillight (red) */}
+      <circle cx="212" cy="42" r="4" fill="var(--brand-yellow)" />
+      <circle cx="212" cy="42" r="1.8" fill="var(--rdx-ink)" opacity="0.5" />
+      <rect x="15" y="41" width="6" height="6" rx="2" fill="var(--brand-red)" />
+      {/* exhaust puff */}
+      <circle cx="8" cy="58" r="3" fill="var(--rdx-glass)" opacity="0.6" />
       {/* wheels */}
       <g className="rdx-wheel" style={{ transformBox: "fill-box", transformOrigin: "center" }}>
-        <circle cx="58" cy="54" r="11" fill="var(--foreground)" />
-        <circle cx="58" cy="54" r="5.5" fill="var(--muted)" />
-        <line x1="58" y1="49" x2="58" y2="59" stroke="var(--foreground)" strokeWidth="2" />
-        <line x1="53" y1="54" x2="63" y2="54" stroke="var(--foreground)" strokeWidth="2" />
+        <circle cx="62" cy="60" r="12" fill="var(--rdx-ink)" />
+        <circle cx="62" cy="60" r="6" fill="var(--rdx-chrome)" />
+        <line x1="62" y1="54" x2="62" y2="66" stroke="var(--rdx-ink)" strokeWidth="2.5" />
+        <line x1="56" y1="60" x2="68" y2="60" stroke="var(--rdx-ink)" strokeWidth="2.5" />
       </g>
       <g className="rdx-wheel" style={{ transformBox: "fill-box", transformOrigin: "center" }}>
-        <circle cx="162" cy="54" r="11" fill="var(--foreground)" />
-        <circle cx="162" cy="54" r="5.5" fill="var(--muted)" />
-        <line x1="162" y1="49" x2="162" y2="59" stroke="var(--foreground)" strokeWidth="2" />
-        <line x1="157" y1="54" x2="167" y2="54" stroke="var(--foreground)" strokeWidth="2" />
+        <circle cx="178" cy="60" r="12" fill="var(--rdx-ink)" />
+        <circle cx="178" cy="60" r="6" fill="var(--rdx-chrome)" />
+        <line x1="178" y1="54" x2="178" y2="66" stroke="var(--rdx-ink)" strokeWidth="2.5" />
+        <line x1="172" y1="60" x2="184" y2="60" stroke="var(--rdx-ink)" strokeWidth="2.5" />
       </g>
     </svg>
   );
