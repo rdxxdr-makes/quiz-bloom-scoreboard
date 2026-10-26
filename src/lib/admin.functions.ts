@@ -33,6 +33,7 @@ export type AdminAttemptRow = {
   branch: string;
   status: string;
   score: number | null;
+  started_at: string | null;
   submitted_at: string | null;
   auto_submitted: boolean;
   enrolled_manually: boolean;
@@ -48,6 +49,7 @@ export type AdminQuizRow = {
   is_published: boolean;
   pin: string;
   questionCount: number;
+  questionStats: Array<{ position: number; accuracy: number; answered: number }>;
   attempts: AdminAttemptRow[];
 };
 
@@ -78,14 +80,14 @@ export const adminDashboard = createServerFn({ method: "POST" })
       supabaseAdmin
         .from("attempts")
         .select(
-          "id, quiz_id, student_id, status, score, started_at, submitted_at, auto_submitted, enrolled_manually, profile:profiles(name, roll_no, branch)",
+          "id, quiz_id, student_id, status, score, started_at, submitted_at, auto_submitted, enrolled_manually, answers, profile:profiles(name, roll_no, branch)",
         )
         .order("submitted_at", { ascending: false, nullsFirst: false }),
       supabaseAdmin
         .from("profiles")
         .select("id, name, roll_no, branch")
         .order("roll_no", { ascending: true }),
-      supabaseAdmin.from("questions").select("id, quiz_id"),
+      supabaseAdmin.from("questions").select("id, quiz_id, position, correct_index"),
     ]);
 
     const quizzes = (quizRes.data ?? []) as Array<{
@@ -109,9 +111,15 @@ export const adminDashboard = createServerFn({ method: "POST" })
       submitted_at: string | null;
       auto_submitted: boolean;
       enrolled_manually: boolean;
+      answers: Record<string, number> | null;
       profile: { name: string; roll_no: string; branch: string } | null;
     }>;
-    const questions = (questionRes.data ?? []) as Array<{ id: string; quiz_id: string }>;
+    const questions = (questionRes.data ?? []) as Array<{
+      id: string;
+      quiz_id: string;
+      position: number;
+      correct_index: number;
+    }>;
 
     const rows: AdminQuizRow[] = quizzes.map((q) => {
       const quizId = q.id;
@@ -119,15 +127,33 @@ export const adminDashboard = createServerFn({ method: "POST" })
         .filter((a) => a.quiz_id === quizId)
         .map((a) => ({
           id: a.id,
+          student_id: a.student_id,
           name: a.profile?.name ?? "Unknown",
           roll_no: a.profile?.roll_no ?? "-",
           branch: a.profile?.branch ?? "-",
           status: a.status,
           score: a.score,
+          started_at: a.started_at,
           submitted_at: a.submitted_at,
           auto_submitted: a.auto_submitted,
           enrolled_manually: a.enrolled_manually,
         }));
+      const quizQuestions = questions
+        .filter((x) => x.quiz_id === quizId)
+        .sort((a, b) => a.position - b.position);
+      const questionStats = quizQuestions.map((qq) => {
+        const answered = quizAttempts.filter(
+          (a) => a.status === "submitted" && a.answers && qq.id in a.answers,
+        ).length;
+        const correct = quizAttempts.filter(
+          (a) => a.status === "submitted" && a.answers && a.answers[qq.id] === qq.correct_index,
+        ).length;
+        return {
+          position: qq.position,
+          answered,
+          accuracy: answered ? Math.round((correct / answered) * 100) : 0,
+        };
+      });
       return {
         id: quizId,
         title: String(q.title),
@@ -137,7 +163,8 @@ export const adminDashboard = createServerFn({ method: "POST" })
         ends_at: String(q.ends_at),
         is_published: Boolean(q.is_published),
         pin: pins.find((p) => p.quiz_id === quizId)?.pin ?? "-",
-        questionCount: questions.filter((x) => x.quiz_id === quizId).length,
+        questionCount: quizQuestions.length,
+        questionStats,
         attempts: quizAttempts,
       };
     });
