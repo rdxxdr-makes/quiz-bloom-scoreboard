@@ -142,11 +142,15 @@ export const adminDashboard = createServerFn({ method: "POST" })
         .filter((x) => x.quiz_id === quizId)
         .sort((a, b) => a.position - b.position);
       const questionStats = quizQuestions.map((qq) => {
-        const answered = quizAttempts.filter(
-          (a) => a.status === "submitted" && a.answers && qq.id in a.answers,
+        const answered = attempts.filter(
+          (a) => a.quiz_id === quizId && a.status === "submitted" && a.answers && qq.id in a.answers,
         ).length;
-        const correct = quizAttempts.filter(
-          (a) => a.status === "submitted" && a.answers && a.answers[qq.id] === qq.correct_index,
+        const correct = attempts.filter(
+          (a) =>
+            a.quiz_id === quizId &&
+            a.status === "submitted" &&
+            a.answers &&
+            a.answers[qq.id] === qq.correct_index,
         ).length;
         return {
           position: qq.position,
