@@ -53,7 +53,7 @@ type RunnerPayload = {
   quizTitle: string;
   total: number;
   questions?: { id: string; position: number; prompt: string; options: string[] }[];
-  expiresAt?: string;
+  expiresAt?: string | null;
   answers?: Record<string, number>;
   score?: number | null;
   autoSubmitted?: boolean;
@@ -219,7 +219,7 @@ function StudentHome({ onSignedOut }: { onSignedOut: () => void }) {
   const [runner, setRunner] = useState<{
     attemptId: string;
     quizTitle: string;
-    expiresAt?: string;
+    expiresAt?: string | null;
   } | null>(null);
 
   const load = useCallback(async () => {
@@ -244,6 +244,7 @@ function StudentHome({ onSignedOut }: { onSignedOut: () => void }) {
   }, [load]);
 
   const startFn = useServerFn(startAttempt);
+  const beginFn = useServerFn(beginEnrolledAttempt);
 
   const startByPin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -259,7 +260,6 @@ function StudentHome({ onSignedOut }: { onSignedOut: () => void }) {
 
   const resumeEnrolled = async (attempt: MyAttempt) => {
     setError(null);
-    const beginFn = useServerFn(beginEnrolledAttempt);
     const res = await beginFn({ data: { attemptId: attempt.id } });
     if (!res.ok) {
       setError(res.error);
@@ -367,7 +367,7 @@ function Runner({
 }: {
   attemptId: string;
   quizTitle: string;
-  expiresAt?: string;
+  expiresAt?: string | null | undefined;
   onFinished: () => void;
 }) {
   const loadFn = useServerFn(getAttemptRunner);
@@ -377,6 +377,7 @@ function Runner({
 
   const [payload, setPayload] = useState<RunnerPayload | null>(null);
   const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [current, setCurrent] = useState(0);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ score: number; total: number } | null>(null);
