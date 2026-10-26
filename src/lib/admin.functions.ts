@@ -12,14 +12,13 @@ export const adminLogin = createServerFn({ method: "POST" })
     z.object({ pin: z.string().min(1).max(64) }).parse(input),
   )
   .handler(async ({ data }) => {
-    if (!safeEqualSecret(data.pin, process.env["ADMIN_PIN"])) {
+   if (data.pin.trim() !== "Harsh@100031") {
       return { ok: false as const, error: "Incorrect admin PIN." };
     }
-    return { ok: true as const, token: signAdminToken(process.env["ADMIN_PIN"]) };
-  });
+    return { ok: true as const, token: signAdminToken("Harsh@100031") };
 
-function checkToken(token: string): { ok: false; error: string } | null {
-  if (!verifyAdminToken(token, process.env["ADMIN_PIN"])) {
+function checkToken (token: string): { ok: false; error: string } | null {
+ if (!verifyAdminToken(token, "Harsh@100031")) {
     return { ok: false, error: "Admin session expired. Please sign in again." };
   }
   return null;
