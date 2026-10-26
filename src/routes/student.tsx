@@ -415,7 +415,7 @@ function Runner({
       setSubmitting(false);
       if (res.ok) {
         const total = "total" in res ? res.total : (payload?.total ?? 0);
-        setResult({ score: res.score, total });
+        setResult({ score: res.score ?? payload?.score ?? 0, total });
         onFinished();
       } else {
         submittedRef.current = false;
@@ -473,6 +473,9 @@ function Runner({
 
   const mins = remaining !== null ? Math.floor(remaining / 60) : null;
   const secs = remaining !== null ? remaining % 60 : null;
+  const qs = payload.questions ?? [];
+  const idx = Math.min(current, Math.max(0, qs.length - 1));
+  const question = qs[idx];
 
   return (
     <div className="mt-8 rounded-xl border border-primary/30 bg-card p-5">
@@ -488,35 +491,59 @@ function Runner({
           {mins !== null ? `⏱ ${mins}:${String(secs).padStart(2, "0")}` : "…"}
         </span>
       </div>
-      <ol className="space-y-5">
-        {payload.questions?.map((q, i) => (
-          <li key={q.id}>
-            <p className="text-sm font-medium text-foreground">
-              {i + 1}. {q.prompt}
+      {question ? (
+        <div>
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Question {idx + 1} of {qs.length}
             </p>
-            <div className="mt-2 grid gap-2 sm:grid-cols-2">
-              {q.options.map((opt, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  disabled={submitting}
-                  onClick={() => {
-                    setAnswers((prev) => ({ ...prev, [q.id]: idx }));
-                    saveFn({ data: { attemptId, questionId: q.id, optionIndex: idx } });
-                  }}
-                  className={`rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
-                    answers[q.id] === idx
-                      ? "border-primary bg-primary/15 text-foreground"
-                      : "border-border bg-background text-muted-foreground hover:bg-muted"
-                  }`}
-                >
-                  {String.fromCharCode(65 + idx)}. {opt}
-                </button>
-              ))}
-            </div>
-          </li>
-        ))}
-      </ol>
+            <span className="text-xs text-muted-foreground">
+              {Object.keys(answers).length}/{qs.length} answered
+            </span>
+          </div>
+          <p className="mt-2 text-sm font-medium text-foreground">{question.prompt}</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {question.options.map((opt, oIdx) => (
+              <button
+                key={oIdx}
+                type="button"
+                disabled={submitting}
+                onClick={() => {
+                  setAnswers((prev) => ({ ...prev, [question.id]: oIdx }));
+                  saveFn({ data: { attemptId, questionId: question.id, optionIndex: oIdx } });
+                }}
+                className={`rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
+                  answers[question.id] === oIdx
+                    ? "border-primary bg-primary/15 text-foreground"
+                    : "border-border bg-background text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                {String.fromCharCode(65 + oIdx)}. {opt}
+              </button>
+            ))}
+          </div>
+          <div className="mt-5 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              disabled={idx === 0 || submitting}
+              onClick={() => setCurrent(idx - 1)}
+              className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-40"
+            >
+              ← Previous
+            </button>
+            <button
+              type="button"
+              disabled={idx >= qs.length - 1 || submitting}
+              onClick={() => setCurrent(idx + 1)}
+              className={`${btnCls} px-4`}
+            >
+              Next →
+            </button>
+          </div>
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">No questions in this quiz yet.</p>
+      )}
       <button
         type="button"
         disabled={submitting}
