@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { STUDENT_PROFILE_KEY } from "./constants";
 import { gradeAnswers, type GradeQuestion } from "./grading";
 
 /**
@@ -15,7 +16,7 @@ export function normalizeRollNo(raw: string): string {
 export function getStoredProfile(): StoredProfile | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem("rdx_student_profile");
+    const raw = localStorage.getItem(STUDENT_PROFILE_KEY);
     return raw ? (JSON.parse(raw) as StoredProfile) : null;
   } catch {
     return null;
@@ -23,11 +24,11 @@ export function getStoredProfile(): StoredProfile | null {
 }
 
 export function setStoredProfile(profile: StoredProfile): void {
-  localStorage.setItem("rdx_student_profile", JSON.stringify(profile));
+  localStorage.setItem(STUDENT_PROFILE_KEY, JSON.stringify(profile));
 }
 
 export function clearStoredProfile(): void {
-  localStorage.removeItem("rdx_student_profile");
+  localStorage.removeItem(STUDENT_PROFILE_KEY);
 }
 
 type Fail = { ok: false; error: string };
